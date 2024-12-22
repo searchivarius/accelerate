@@ -65,22 +65,21 @@ class LocalSGD:
             enabled (`bool):
                 Local SGD is disabled if this parameter set to `False`.
         """
-        if accelerator.distributed_type not in [
-            DistributedType.NO,
-            DistributedType.MULTI_CPU,
-            DistributedType.MULTI_GPU,
-            DistributedType.MULTI_XPU,
-            DistributedType.MULTI_MLU,
-            DistributedType.MULTI_MUSA,
-            DistributedType.MULTI_NPU,
-        ]:
-            raise NotImplementedError("LocalSGD is supported only for CPUs and GPUs (no DeepSpeed or MegatronLM)")
         self.enabled = enabled and accelerator.distributed_type != DistributedType.NO
         self.num_steps = 0
         if self.enabled:
             self.accelerator = accelerator
             self.model = model
             self.local_sgd_steps = local_sgd_steps
+            if accelerator.distributed_type not in [
+                DistributedType.NO,
+                DistributedType.MULTI_CPU,
+                DistributedType.MULTI_GPU,
+                DistributedType.MULTI_MLU,
+                DistributedType.MULTI_MUSA,
+                DistributedType.MULTI_NPU,
+            ]:
+                raise NotImplementedError("LocalSGD is supported only for CPUs and GPUs (no DeepSpeed or MegatronLM)")
 
     def step(self):
         """
